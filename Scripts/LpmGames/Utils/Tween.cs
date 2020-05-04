@@ -6,11 +6,13 @@ namespace LpmGames.Utils
 {
     public static class Tween
     {
+        private static readonly AnimationCurve DefaultAnimationCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+        
         public static IEnumerator Start(float duration, Action<float> onUpdate, Action onComplete, AnimationCurve curve = null)
         {
             if (curve == null)
             {
-                curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+                curve = DefaultAnimationCurve;
             }
 
             var start = Time.time;
