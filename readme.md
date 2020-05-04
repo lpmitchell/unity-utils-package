@@ -1,5 +1,16 @@
 # Unity helper utilities
 
+## Installation
+
+In the Unity Package Manager window, click the "+" button at the top-left and select 
+"Add package from git URL"
+
+Enter the following URL:
+
+`https://github.com/lpmitchell/unity-utils-package.git`
+
+## Documentation (WIP)
+
 *Collection extensions:*
 Adds methods to do common things to arrays or lists:
 - `myGameObjectArray.AllSetActive(false);`
