@@ -5,8 +5,7 @@
   "unity": "2019.3",
   "description": "This library contains a set of utilities to help with common unity gamedev related processes",
   "keywords": [
-    "ui",
-    "differencegames"
+    "utils"
   ],
   "category": "LPM Games",
   "type": "library",
