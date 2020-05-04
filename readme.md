@@ -25,22 +25,27 @@ New attribute to add a single Layer selector as an int field, because Unity has 
 
 *Coroutine helpers:*
 - `WaitForContinue` class:
-```var hold = new WaitForContinue();
+```cs
+var hold = new WaitForContinue();
 // continue can now be passed to something else, like a UI panel
-yield return hold; // halt execution of this coroutine until we can continue```
+yield return hold; // halt execution of this coroutine until we can continue
+```
+
 The above coroutine will continue when you call `hold.Continue();`
 
 - `WaitForResult<T>` class:
   -  This is like WaitForContinue but you can set a return value to be passed back to the coroutine
 
-  *Patterns*
+*Patterns*
 - `Boxed<T>` is a simple generic class to box a value-type, so you can do something like:
-```var myBoxedInt = new Boxed<int>(5);
+```cs
+var myBoxedInt = new Boxed<int>(5);
 otherThing.referencedInt = myBoxedInt;
 // otherThing will be able to see this change also:
 myBoxedInt.Value = 6;
 // also you can listen for changes:
-myBoxedInt.Changed += onIntChanged;```
+myBoxedInt.Changed += onIntChanged;
+```
 
 *Tween library*
 I have a _really_ simple tween library (59 lines of code) in there also
