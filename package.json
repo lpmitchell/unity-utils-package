@@ -1,7 +1,7 @@
 {
   "name": "com.lpmitchell.games.utils",
   "displayName": "LPM Unity Game Utility classes",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "unity": "2019.3",
   "description": "This library contains a set of utilities to help with common unity gamedev related processes",
   "keywords": [

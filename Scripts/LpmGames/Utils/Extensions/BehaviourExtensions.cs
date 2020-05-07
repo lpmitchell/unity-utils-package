@@ -15,6 +15,18 @@ namespace LpmGames.Utils.Extensions
             return behaviour.StartCoroutine(DestroyInSecondsCoroutine(behaviour, seconds));
         }
 
+        public static void DestroyEditorSafe(this Object obj)
+        {
+            if (Application.isPlaying)
+            {
+                Object.Destroy(obj);
+            }
+            else
+            {
+                Object.DestroyImmediate(obj);
+            }
+        }
+
         private static IEnumerator DestroyInSecondsCoroutine(Object gameObject, float seconds)
         {
             yield return new WaitForSeconds(seconds);
