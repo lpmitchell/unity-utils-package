@@ -120,8 +120,7 @@ namespace LpmGames.Utils
                         Interpolate<T1>(start.Item2, end.Item2, t), 
                         Interpolate<T2>(start.Item3, end.Item3, t)
                     )
-                , () => 
-                    onComplete(end.Item1, end.Item2, end.Item3), curve);
+                , onComplete, curve);
         }
         
         public static IEnumerator Start<T0,T1,T2,T3>(float duration, (T0,T1,T2,T3) start, (T0,T1,T2,T3) end, Action<T0,T1,T2,T3> onUpdate, Action onComplete, AnimationCurve curve = null)
