@@ -16,6 +16,7 @@ namespace LpmGames.Utils.Debug
         #endif
         
         public static readonly Queue<string> LogHistory = new Queue<string>(500);
+        public static int FailedAssertionCount;
 
         public static string PathToTag(string path, int lineNumber)
         {
@@ -48,6 +49,7 @@ namespace LpmGames.Utils.Debug
         public static void AssertMessage(bool assert, string message, object data = null, [CallerFilePath] string tag = "Unknown", [CallerLineNumber] int lineNumber = 0)
         {
             if (assert) return;
+            FailedAssertionCount++;
             tag = PathToTag(tag, lineNumber);
             Write($"[{tag}.Assert] " + message, data);
         }
@@ -56,6 +58,7 @@ namespace LpmGames.Utils.Debug
         public static void Assert(bool assert, string message, object data = null, [CallerFilePath] string tag = "Unknown", [CallerLineNumber] int lineNumber = 0)
         {
             if (assert) return;
+            FailedAssertionCount++;
             tag = PathToTag(tag, lineNumber);
             WriteWarn($"[{tag}.Assert]" + message, data);
         }
@@ -64,6 +67,7 @@ namespace LpmGames.Utils.Debug
         public static void AssertError(bool assert, string message, object data = null, [CallerFilePath] string tag = "Unknown", [CallerLineNumber] int lineNumber = 0)
         {
             if (assert) return;
+            FailedAssertionCount++;
             tag = PathToTag(tag, lineNumber);
             WriteError($"[{tag}.Assert] " + message, data);
         }
