@@ -17,13 +17,13 @@ namespace Extensions
             
             var targetRatio = xSize / ySize;
  
-            if (screenRatio < targetRatio)
+            if (targetRatio > screenRatio)
             {
-                return ySize / 2f;
+                var differenceInSize = targetRatio / screenRatio;
+                return ySize / 2 * differenceInSize;
             }
 
-            var differenceInSize = targetRatio / screenRatio;
-            return ySize / 2 * differenceInSize;
+            return ySize / 2f;
         }
         
         // I'm sure this could be more optimized but it works. I will revisit in the future to see if it can be made more
