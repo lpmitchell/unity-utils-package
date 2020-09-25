@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace LpmGames.Utils
 {
-        public static class Tween
+    public static class Tween
     {
         private static readonly AnimationCurve DefaultAnimationCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
         
