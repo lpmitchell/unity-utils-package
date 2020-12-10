@@ -17,7 +17,17 @@ namespace LpmGames.Utils.Debug
         
         public static readonly Queue<string> LogHistory = new Queue<string>(500);
         public static int FailedAssertionCount;
+        public static LogLevel MinLevel = LogLevel.Debug;
 
+        public enum LogLevel
+        {
+            Debug = 0,
+            Warning = 1,
+            Error = 2,
+            Assert = 3,
+            None = 4
+        }
+        
         public static string PathToTag(string path, int lineNumber)
         {
             var tag = path.Replace('\\', '/');
@@ -27,6 +37,7 @@ namespace LpmGames.Utils.Debug
         [Conditional("UNITY_WEBGL"), Conditional("UNITY_EDITOR")]
         public static void Message(string message, object data = null, [CallerFilePath] string tag = "Unknown", [CallerLineNumber] int lineNumber = 0)
         {
+            if (MinLevel > LogLevel.Debug) return;
             tag = PathToTag(tag, lineNumber);
             Write($"[{tag}] " + message, data);
         }
@@ -34,6 +45,7 @@ namespace LpmGames.Utils.Debug
         [Conditional("UNITY_WEBGL"), Conditional("UNITY_EDITOR")]
         public static void Warning(string message, object data = null, [CallerFilePath] string tag = "Unknown", [CallerLineNumber] int lineNumber = 0)
         {
+            if (MinLevel > LogLevel.Warning) return;
             tag = PathToTag(tag, lineNumber);
             WriteWarn($"[{tag}] " + message, data);
         }
@@ -41,6 +53,7 @@ namespace LpmGames.Utils.Debug
         [Conditional("UNITY_WEBGL"), Conditional("UNITY_EDITOR")]
         public static void Error(string message, object data = null, [CallerFilePath] string tag = "Unknown", [CallerLineNumber] int lineNumber = 0)
         {
+            if (MinLevel > LogLevel.Error) return;
             tag = PathToTag(tag, lineNumber);
             WriteError($"[{tag}] " + message, data);
         }
@@ -50,6 +63,7 @@ namespace LpmGames.Utils.Debug
         {
             if (assert) return;
             FailedAssertionCount++;
+            if (MinLevel > LogLevel.Assert) return;
             tag = PathToTag(tag, lineNumber);
             Write($"[{tag}.Assert] " + message, data);
         }
@@ -68,6 +82,7 @@ namespace LpmGames.Utils.Debug
         {
             if (assert) return;
             FailedAssertionCount++;
+            if (MinLevel > LogLevel.Assert) return;
             tag = PathToTag(tag, lineNumber);
             WriteError($"[{tag}.Assert] " + message, data);
         }
