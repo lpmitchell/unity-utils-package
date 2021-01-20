@@ -1,18 +1,27 @@
 ﻿using System;
 using System.Collections;
+using LpmGames.Utils.Easing;
 using UnityEngine;
 
 namespace LpmGames.Utils
 {
     public static class Tween
-    {
-        private static readonly AnimationCurve DefaultAnimationCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
-        
-        public static IEnumerator Start(float duration, Action<float> onUpdate, Action onComplete, AnimationCurve curve = null)
+    {   
+        public static IEnumerator Start(float duration, Action<float> onUpdate, Action onComplete, AnimationCurve curve)
         {
-            if (curve == null)
+            return Start(duration, onUpdate, onComplete, curve.Evaluate);
+        }
+        
+        public static IEnumerator Start(float duration, Action<float> onUpdate, Action onComplete, Ease ease = Ease.QuadEaseInOut)
+        {
+            return Start(duration, onUpdate, onComplete, EaseFactory.GetEquation(ease));
+        }
+        
+        public static IEnumerator Start(float duration, Action<float> onUpdate, Action onComplete, Func<float, float> ease)
+        {
+            if (ease == null)
             {
-                curve = DefaultAnimationCurve;
+                ease = EaseFactory.GetEquation(Ease.QuadEaseInOut);
             }
 
             var start = Time.time;
@@ -21,7 +30,7 @@ namespace LpmGames.Utils
             {
                 var progress = (Time.time - start) / duration;
                 if (progress > 1f) progress = 1f;
-                onUpdate(curve.Evaluate(progress));
+                onUpdate(ease.Invoke(progress));
                 yield return null;
             }
             onUpdate(1f);
@@ -100,7 +109,9 @@ namespace LpmGames.Utils
             return default;
         }
 
-        public static IEnumerator Start<T0,T1>(float duration, (T0,T1) start, (T0,T1) end, Action<T0,T1> onUpdate, Action onComplete, AnimationCurve curve = null)
+        #region Animation Curve
+        
+        public static IEnumerator Start<T0,T1>(float duration, (T0,T1) start, (T0,T1) end, Action<T0,T1> onUpdate, Action onComplete, AnimationCurve ease)
         {
             VerifyValidTypes(typeof(T0), typeof(T1));
             yield return Start(duration, t =>
@@ -108,10 +119,10 @@ namespace LpmGames.Utils
                         Interpolate<T0>(start.Item1, end.Item1, t), 
                         Interpolate<T1>(start.Item2, end.Item2, t)
                     )
-                , onComplete, curve);
+                , onComplete, ease);
         }
         
-        public static IEnumerator Start<T0,T1,T2>(float duration, (T0,T1,T2) start, (T0,T1,T2) end, Action<T0,T1,T2> onUpdate, Action onComplete, AnimationCurve curve = null)
+        public static IEnumerator Start<T0,T1,T2>(float duration, (T0,T1,T2) start, (T0,T1,T2) end, Action<T0,T1,T2> onUpdate, Action onComplete, AnimationCurve ease)
         {
             VerifyValidTypes(typeof(T0), typeof(T1), typeof(T2));
             yield return Start(duration, t =>
@@ -120,10 +131,10 @@ namespace LpmGames.Utils
                         Interpolate<T1>(start.Item2, end.Item2, t), 
                         Interpolate<T2>(start.Item3, end.Item3, t)
                     )
-                , onComplete, curve);
+                , onComplete, ease);
         }
         
-        public static IEnumerator Start<T0,T1,T2,T3>(float duration, (T0,T1,T2,T3) start, (T0,T1,T2,T3) end, Action<T0,T1,T2,T3> onUpdate, Action onComplete, AnimationCurve curve = null)
+        public static IEnumerator Start<T0,T1,T2,T3>(float duration, (T0,T1,T2,T3) start, (T0,T1,T2,T3) end, Action<T0,T1,T2,T3> onUpdate, Action onComplete, AnimationCurve ease)
         {
             VerifyValidTypes(typeof(T0), typeof(T1), typeof(T2), typeof(T3));
             yield return Start(duration, t =>
@@ -133,10 +144,10 @@ namespace LpmGames.Utils
                         Interpolate<T2>(start.Item3, end.Item3, t), 
                         Interpolate<T3>(start.Item4, end.Item4, t)
                     )
-                , onComplete, curve);
+                , onComplete, ease);
         }
         
-        public static IEnumerator Start<T0,T1,T2,T3,T4>(float duration, (T0,T1,T2,T3,T4) start, (T0,T1,T2,T3,T4) end, Action<T0,T1,T2,T3,T4> onUpdate, Action onComplete, AnimationCurve curve = null)
+        public static IEnumerator Start<T0,T1,T2,T3,T4>(float duration, (T0,T1,T2,T3,T4) start, (T0,T1,T2,T3,T4) end, Action<T0,T1,T2,T3,T4> onUpdate, Action onComplete, AnimationCurve ease)
         {
             VerifyValidTypes(typeof(T0), typeof(T1), typeof(T2), typeof(T3), typeof(T4));
             yield return Start(duration, t =>
@@ -147,10 +158,10 @@ namespace LpmGames.Utils
                         Interpolate<T3>(start.Item4, end.Item4, t), 
                         Interpolate<T4>(start.Item5, end.Item5, t)
                     )
-                , onComplete, curve);
+                , onComplete, ease);
         }
         
-        public static IEnumerator Start<T0,T1,T2,T3,T4,T5>(float duration, (T0,T1,T2,T3,T4,T5) start, (T0,T1,T2,T3,T4,T5) end, Action<T0,T1,T2,T3,T4,T5> onUpdate, Action onComplete, AnimationCurve curve = null)
+        public static IEnumerator Start<T0,T1,T2,T3,T4,T5>(float duration, (T0,T1,T2,T3,T4,T5) start, (T0,T1,T2,T3,T4,T5) end, Action<T0,T1,T2,T3,T4,T5> onUpdate, Action onComplete, AnimationCurve ease)
         {
             VerifyValidTypes(typeof(T0), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
             yield return Start(duration, t =>
@@ -162,10 +173,10 @@ namespace LpmGames.Utils
                         Interpolate<T4>(start.Item5, end.Item5, t), 
                         Interpolate<T5>(start.Item6, end.Item6, t)
                     )
-                , onComplete, curve);
+                , onComplete, ease);
         }
         
-        public static IEnumerator Start<T0,T1,T2,T3,T4,T5,T6>(float duration, (T0,T1,T2,T3,T4,T5,T6) start, (T0,T1,T2,T3,T4,T5,T6) end, Action<T0,T1,T2,T3,T4,T5,T6> onUpdate, Action onComplete, AnimationCurve curve = null)
+        public static IEnumerator Start<T0,T1,T2,T3,T4,T5,T6>(float duration, (T0,T1,T2,T3,T4,T5,T6) start, (T0,T1,T2,T3,T4,T5,T6) end, Action<T0,T1,T2,T3,T4,T5,T6> onUpdate, Action onComplete, AnimationCurve ease)
         {
             VerifyValidTypes(typeof(T0), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6));
             yield return Start(duration, t =>
@@ -178,10 +189,10 @@ namespace LpmGames.Utils
                         Interpolate<T5>(start.Item6, end.Item6, t), 
                         Interpolate<T6>(start.Item7, end.Item7, t)
                     )
-                , onComplete, curve);
+                , onComplete, ease);
         }
         
-        public static IEnumerator Start<T0,T1,T2,T3,T4,T5,T6,T7>(float duration, (T0,T1,T2,T3,T4,T5,T6,T7) start, (T0,T1,T2,T3,T4,T5,T6,T7) end, Action<T0,T1,T2,T3,T4,T5,T6,T7> onUpdate, Action onComplete, AnimationCurve curve = null)
+        public static IEnumerator Start<T0,T1,T2,T3,T4,T5,T6,T7>(float duration, (T0,T1,T2,T3,T4,T5,T6,T7) start, (T0,T1,T2,T3,T4,T5,T6,T7) end, Action<T0,T1,T2,T3,T4,T5,T6,T7> onUpdate, Action onComplete, AnimationCurve ease)
         {
             VerifyValidTypes(typeof(T0), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7));
             yield return Start(duration, t =>
@@ -195,37 +206,303 @@ namespace LpmGames.Utils
                         Interpolate<T6>(start.Item7, end.Item7, t), 
                         Interpolate<T7>(start.Item8, end.Item8, t)
                     )
-                , onComplete, curve);
+                , onComplete, ease);
         }
         
-        public static IEnumerator Start(float duration, float start, float end, Action<float> onUpdate, Action onComplete, AnimationCurve curve = null)
+        public static IEnumerator Start(float duration, float start, float end, Action<float> onUpdate, Action onComplete, AnimationCurve ease)
         {
-            yield return Start(duration, t => onUpdate(Mathf.LerpUnclamped(start, end, t)), onComplete, curve);
+            yield return Start(duration, t => onUpdate(Mathf.LerpUnclamped(start, end, t)), onComplete, ease);
         }
         
-        public static IEnumerator Start(float duration, Color start, Color end, Action<Color> onUpdate, Action onComplete, AnimationCurve curve = null)
+        public static IEnumerator Start(float duration, Color start, Color end, Action<Color> onUpdate, Action onComplete, AnimationCurve ease)
         {
-            yield return Start(duration, t => onUpdate(Color.LerpUnclamped(start, end, t)), onComplete, curve);
+            yield return Start(duration, t => onUpdate(Color.LerpUnclamped(start, end, t)), onComplete, ease);
         }
         
-        public static IEnumerator Start(float duration, Vector2 start, Vector2 end, Action<Vector2> onUpdate, Action onComplete, AnimationCurve curve = null)
+        public static IEnumerator Start(float duration, Vector2 start, Vector2 end, Action<Vector2> onUpdate, Action onComplete, AnimationCurve ease)
         {
-            yield return Start(duration, t => onUpdate(Vector2.LerpUnclamped(start, end, t)), onComplete, curve);
+            yield return Start(duration, t => onUpdate(Vector2.LerpUnclamped(start, end, t)), onComplete, ease);
         }
         
-        public static IEnumerator Start(float duration, Vector3 start, Vector3 end, Action<Vector3> onUpdate, Action onComplete, AnimationCurve curve = null)
+        public static IEnumerator Start(float duration, Vector3 start, Vector3 end, Action<Vector3> onUpdate, Action onComplete, AnimationCurve ease)
         {
-            yield return Start(duration, t => onUpdate(Vector3.LerpUnclamped(start, end, t)), onComplete, curve);
+            yield return Start(duration, t => onUpdate(Vector3.LerpUnclamped(start, end, t)), onComplete, ease);
         }
         
-        public static IEnumerator Start(float duration, Vector4 start, Vector4 end, Action<Vector4> onUpdate, Action onComplete, AnimationCurve curve = null)
+        public static IEnumerator Start(float duration, Vector4 start, Vector4 end, Action<Vector4> onUpdate, Action onComplete, AnimationCurve ease)
         {
-            yield return Start(duration, t => onUpdate(Vector4.LerpUnclamped(start, end, t)), onComplete, curve);
+            yield return Start(duration, t => onUpdate(Vector4.LerpUnclamped(start, end, t)), onComplete, ease);
         }
         
-        public static IEnumerator Start(float duration, Quaternion start, Quaternion end, Action<Quaternion> onUpdate, Action onComplete, AnimationCurve curve = null)
+        public static IEnumerator Start(float duration, Quaternion start, Quaternion end, Action<Quaternion> onUpdate, Action onComplete, AnimationCurve ease)
         {
-            yield return Start(duration, t => onUpdate(Quaternion.LerpUnclamped(start, end, t)), onComplete, curve);
+            yield return Start(duration, t => onUpdate(Quaternion.LerpUnclamped(start, end, t)), onComplete, ease);
         }
+        
+        #endregion
+        
+        #region With Easing Equations
+        
+        public static IEnumerator Start<T0,T1>(float duration, (T0,T1) start, (T0,T1) end, Action<T0,T1> onUpdate, Action onComplete, Ease ease = Ease.QuadEaseInOut)
+        {
+            VerifyValidTypes(typeof(T0), typeof(T1));
+            yield return Start(duration, t =>
+                    onUpdate(
+                        Interpolate<T0>(start.Item1, end.Item1, t), 
+                        Interpolate<T1>(start.Item2, end.Item2, t)
+                    )
+                , onComplete, ease);
+        }
+        
+        public static IEnumerator Start<T0,T1,T2>(float duration, (T0,T1,T2) start, (T0,T1,T2) end, Action<T0,T1,T2> onUpdate, Action onComplete, Ease ease = Ease.QuadEaseInOut)
+        {
+            VerifyValidTypes(typeof(T0), typeof(T1), typeof(T2));
+            yield return Start(duration, t =>
+                    onUpdate(
+                        Interpolate<T0>(start.Item1, end.Item1, t), 
+                        Interpolate<T1>(start.Item2, end.Item2, t), 
+                        Interpolate<T2>(start.Item3, end.Item3, t)
+                    )
+                , onComplete, ease);
+        }
+        
+        public static IEnumerator Start<T0,T1,T2,T3>(float duration, (T0,T1,T2,T3) start, (T0,T1,T2,T3) end, Action<T0,T1,T2,T3> onUpdate, Action onComplete, Ease ease = Ease.QuadEaseInOut)
+        {
+            VerifyValidTypes(typeof(T0), typeof(T1), typeof(T2), typeof(T3));
+            yield return Start(duration, t =>
+                    onUpdate(
+                        Interpolate<T0>(start.Item1, end.Item1, t), 
+                        Interpolate<T1>(start.Item2, end.Item2, t), 
+                        Interpolate<T2>(start.Item3, end.Item3, t), 
+                        Interpolate<T3>(start.Item4, end.Item4, t)
+                    )
+                , onComplete, ease);
+        }
+        
+        public static IEnumerator Start<T0,T1,T2,T3,T4>(float duration, (T0,T1,T2,T3,T4) start, (T0,T1,T2,T3,T4) end, Action<T0,T1,T2,T3,T4> onUpdate, Action onComplete, Ease ease = Ease.QuadEaseInOut)
+        {
+            VerifyValidTypes(typeof(T0), typeof(T1), typeof(T2), typeof(T3), typeof(T4));
+            yield return Start(duration, t =>
+                    onUpdate(
+                        Interpolate<T0>(start.Item1, end.Item1, t), 
+                        Interpolate<T1>(start.Item2, end.Item2, t), 
+                        Interpolate<T2>(start.Item3, end.Item3, t), 
+                        Interpolate<T3>(start.Item4, end.Item4, t), 
+                        Interpolate<T4>(start.Item5, end.Item5, t)
+                    )
+                , onComplete, ease);
+        }
+        
+        public static IEnumerator Start<T0,T1,T2,T3,T4,T5>(float duration, (T0,T1,T2,T3,T4,T5) start, (T0,T1,T2,T3,T4,T5) end, Action<T0,T1,T2,T3,T4,T5> onUpdate, Action onComplete, Ease ease = Ease.QuadEaseInOut)
+        {
+            VerifyValidTypes(typeof(T0), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
+            yield return Start(duration, t =>
+                    onUpdate(
+                        Interpolate<T0>(start.Item1, end.Item1, t), 
+                        Interpolate<T1>(start.Item2, end.Item2, t), 
+                        Interpolate<T2>(start.Item3, end.Item3, t), 
+                        Interpolate<T3>(start.Item4, end.Item4, t), 
+                        Interpolate<T4>(start.Item5, end.Item5, t), 
+                        Interpolate<T5>(start.Item6, end.Item6, t)
+                    )
+                , onComplete, ease);
+        }
+        
+        public static IEnumerator Start<T0,T1,T2,T3,T4,T5,T6>(float duration, (T0,T1,T2,T3,T4,T5,T6) start, (T0,T1,T2,T3,T4,T5,T6) end, Action<T0,T1,T2,T3,T4,T5,T6> onUpdate, Action onComplete, Ease ease = Ease.QuadEaseInOut)
+        {
+            VerifyValidTypes(typeof(T0), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6));
+            yield return Start(duration, t =>
+                    onUpdate(
+                        Interpolate<T0>(start.Item1, end.Item1, t), 
+                        Interpolate<T1>(start.Item2, end.Item2, t), 
+                        Interpolate<T2>(start.Item3, end.Item3, t), 
+                        Interpolate<T3>(start.Item4, end.Item4, t), 
+                        Interpolate<T4>(start.Item5, end.Item5, t), 
+                        Interpolate<T5>(start.Item6, end.Item6, t), 
+                        Interpolate<T6>(start.Item7, end.Item7, t)
+                    )
+                , onComplete, ease);
+        }
+        
+        public static IEnumerator Start<T0,T1,T2,T3,T4,T5,T6,T7>(float duration, (T0,T1,T2,T3,T4,T5,T6,T7) start, (T0,T1,T2,T3,T4,T5,T6,T7) end, Action<T0,T1,T2,T3,T4,T5,T6,T7> onUpdate, Action onComplete, Ease ease = Ease.QuadEaseInOut)
+        {
+            VerifyValidTypes(typeof(T0), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7));
+            yield return Start(duration, t =>
+                    onUpdate(
+                        Interpolate<T0>(start.Item1, end.Item1, t), 
+                        Interpolate<T1>(start.Item2, end.Item2, t), 
+                        Interpolate<T2>(start.Item3, end.Item3, t), 
+                        Interpolate<T3>(start.Item4, end.Item4, t), 
+                        Interpolate<T4>(start.Item5, end.Item5, t), 
+                        Interpolate<T5>(start.Item6, end.Item6, t), 
+                        Interpolate<T6>(start.Item7, end.Item7, t), 
+                        Interpolate<T7>(start.Item8, end.Item8, t)
+                    )
+                , onComplete, ease);
+        }
+        
+        public static IEnumerator Start(float duration, float start, float end, Action<float> onUpdate, Action onComplete, Ease ease = Ease.QuadEaseInOut)
+        {
+            yield return Start(duration, t => onUpdate(Mathf.LerpUnclamped(start, end, t)), onComplete, ease);
+        }
+        
+        public static IEnumerator Start(float duration, Color start, Color end, Action<Color> onUpdate, Action onComplete, Ease ease = Ease.QuadEaseInOut)
+        {
+            yield return Start(duration, t => onUpdate(Color.LerpUnclamped(start, end, t)), onComplete, ease);
+        }
+        
+        public static IEnumerator Start(float duration, Vector2 start, Vector2 end, Action<Vector2> onUpdate, Action onComplete, Ease ease = Ease.QuadEaseInOut)
+        {
+            yield return Start(duration, t => onUpdate(Vector2.LerpUnclamped(start, end, t)), onComplete, ease);
+        }
+        
+        public static IEnumerator Start(float duration, Vector3 start, Vector3 end, Action<Vector3> onUpdate, Action onComplete, Ease ease = Ease.QuadEaseInOut)
+        {
+            yield return Start(duration, t => onUpdate(Vector3.LerpUnclamped(start, end, t)), onComplete, ease);
+        }
+        
+        public static IEnumerator Start(float duration, Vector4 start, Vector4 end, Action<Vector4> onUpdate, Action onComplete, Ease ease = Ease.QuadEaseInOut)
+        {
+            yield return Start(duration, t => onUpdate(Vector4.LerpUnclamped(start, end, t)), onComplete, ease);
+        }
+        
+        public static IEnumerator Start(float duration, Quaternion start, Quaternion end, Action<Quaternion> onUpdate, Action onComplete, Ease ease = Ease.QuadEaseInOut)
+        {
+            yield return Start(duration, t => onUpdate(Quaternion.LerpUnclamped(start, end, t)), onComplete, ease);
+        }
+        
+        #endregion
+        
+        #region With Ease Callback
+        
+        public static IEnumerator Start<T0,T1>(float duration, (T0,T1) start, (T0,T1) end, Action<T0,T1> onUpdate, Action onComplete, Func<float,float> ease)
+        {
+            VerifyValidTypes(typeof(T0), typeof(T1));
+            yield return Start(duration, t =>
+                    onUpdate(
+                        Interpolate<T0>(start.Item1, end.Item1, t), 
+                        Interpolate<T1>(start.Item2, end.Item2, t)
+                    )
+                , onComplete, ease);
+        }
+        
+        public static IEnumerator Start<T0,T1,T2>(float duration, (T0,T1,T2) start, (T0,T1,T2) end, Action<T0,T1,T2> onUpdate, Action onComplete, Func<float,float> ease)
+        {
+            VerifyValidTypes(typeof(T0), typeof(T1), typeof(T2));
+            yield return Start(duration, t =>
+                    onUpdate(
+                        Interpolate<T0>(start.Item1, end.Item1, t), 
+                        Interpolate<T1>(start.Item2, end.Item2, t), 
+                        Interpolate<T2>(start.Item3, end.Item3, t)
+                    )
+                , onComplete, ease);
+        }
+        
+        public static IEnumerator Start<T0,T1,T2,T3>(float duration, (T0,T1,T2,T3) start, (T0,T1,T2,T3) end, Action<T0,T1,T2,T3> onUpdate, Action onComplete, Func<float,float> ease)
+        {
+            VerifyValidTypes(typeof(T0), typeof(T1), typeof(T2), typeof(T3));
+            yield return Start(duration, t =>
+                    onUpdate(
+                        Interpolate<T0>(start.Item1, end.Item1, t), 
+                        Interpolate<T1>(start.Item2, end.Item2, t), 
+                        Interpolate<T2>(start.Item3, end.Item3, t), 
+                        Interpolate<T3>(start.Item4, end.Item4, t)
+                    )
+                , onComplete, ease);
+        }
+        
+        public static IEnumerator Start<T0,T1,T2,T3,T4>(float duration, (T0,T1,T2,T3,T4) start, (T0,T1,T2,T3,T4) end, Action<T0,T1,T2,T3,T4> onUpdate, Action onComplete, Func<float,float> ease)
+        {
+            VerifyValidTypes(typeof(T0), typeof(T1), typeof(T2), typeof(T3), typeof(T4));
+            yield return Start(duration, t =>
+                    onUpdate(
+                        Interpolate<T0>(start.Item1, end.Item1, t), 
+                        Interpolate<T1>(start.Item2, end.Item2, t), 
+                        Interpolate<T2>(start.Item3, end.Item3, t), 
+                        Interpolate<T3>(start.Item4, end.Item4, t), 
+                        Interpolate<T4>(start.Item5, end.Item5, t)
+                    )
+                , onComplete, ease);
+        }
+        
+        public static IEnumerator Start<T0,T1,T2,T3,T4,T5>(float duration, (T0,T1,T2,T3,T4,T5) start, (T0,T1,T2,T3,T4,T5) end, Action<T0,T1,T2,T3,T4,T5> onUpdate, Action onComplete, Func<float,float> ease)
+        {
+            VerifyValidTypes(typeof(T0), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
+            yield return Start(duration, t =>
+                    onUpdate(
+                        Interpolate<T0>(start.Item1, end.Item1, t), 
+                        Interpolate<T1>(start.Item2, end.Item2, t), 
+                        Interpolate<T2>(start.Item3, end.Item3, t), 
+                        Interpolate<T3>(start.Item4, end.Item4, t), 
+                        Interpolate<T4>(start.Item5, end.Item5, t), 
+                        Interpolate<T5>(start.Item6, end.Item6, t)
+                    )
+                , onComplete, ease);
+        }
+        
+        public static IEnumerator Start<T0,T1,T2,T3,T4,T5,T6>(float duration, (T0,T1,T2,T3,T4,T5,T6) start, (T0,T1,T2,T3,T4,T5,T6) end, Action<T0,T1,T2,T3,T4,T5,T6> onUpdate, Action onComplete, Func<float,float> ease)
+        {
+            VerifyValidTypes(typeof(T0), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6));
+            yield return Start(duration, t =>
+                    onUpdate(
+                        Interpolate<T0>(start.Item1, end.Item1, t), 
+                        Interpolate<T1>(start.Item2, end.Item2, t), 
+                        Interpolate<T2>(start.Item3, end.Item3, t), 
+                        Interpolate<T3>(start.Item4, end.Item4, t), 
+                        Interpolate<T4>(start.Item5, end.Item5, t), 
+                        Interpolate<T5>(start.Item6, end.Item6, t), 
+                        Interpolate<T6>(start.Item7, end.Item7, t)
+                    )
+                , onComplete, ease);
+        }
+        
+        public static IEnumerator Start<T0,T1,T2,T3,T4,T5,T6,T7>(float duration, (T0,T1,T2,T3,T4,T5,T6,T7) start, (T0,T1,T2,T3,T4,T5,T6,T7) end, Action<T0,T1,T2,T3,T4,T5,T6,T7> onUpdate, Action onComplete, Func<float,float> ease)
+        {
+            VerifyValidTypes(typeof(T0), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7));
+            yield return Start(duration, t =>
+                    onUpdate(
+                        Interpolate<T0>(start.Item1, end.Item1, t), 
+                        Interpolate<T1>(start.Item2, end.Item2, t), 
+                        Interpolate<T2>(start.Item3, end.Item3, t), 
+                        Interpolate<T3>(start.Item4, end.Item4, t), 
+                        Interpolate<T4>(start.Item5, end.Item5, t), 
+                        Interpolate<T5>(start.Item6, end.Item6, t), 
+                        Interpolate<T6>(start.Item7, end.Item7, t), 
+                        Interpolate<T7>(start.Item8, end.Item8, t)
+                    )
+                , onComplete, ease);
+        }
+        
+        public static IEnumerator Start(float duration, float start, float end, Action<float> onUpdate, Action onComplete, Func<float,float> ease)
+        {
+            yield return Start(duration, t => onUpdate(Mathf.LerpUnclamped(start, end, t)), onComplete, ease);
+        }
+        
+        public static IEnumerator Start(float duration, Color start, Color end, Action<Color> onUpdate, Action onComplete, Func<float,float> ease)
+        {
+            yield return Start(duration, t => onUpdate(Color.LerpUnclamped(start, end, t)), onComplete, ease);
+        }
+        
+        public static IEnumerator Start(float duration, Vector2 start, Vector2 end, Action<Vector2> onUpdate, Action onComplete, Func<float,float> ease)
+        {
+            yield return Start(duration, t => onUpdate(Vector2.LerpUnclamped(start, end, t)), onComplete, ease);
+        }
+        
+        public static IEnumerator Start(float duration, Vector3 start, Vector3 end, Action<Vector3> onUpdate, Action onComplete, Func<float,float> ease)
+        {
+            yield return Start(duration, t => onUpdate(Vector3.LerpUnclamped(start, end, t)), onComplete, ease);
+        }
+        
+        public static IEnumerator Start(float duration, Vector4 start, Vector4 end, Action<Vector4> onUpdate, Action onComplete, Func<float,float> ease)
+        {
+            yield return Start(duration, t => onUpdate(Vector4.LerpUnclamped(start, end, t)), onComplete, ease);
+        }
+        
+        public static IEnumerator Start(float duration, Quaternion start, Quaternion end, Action<Quaternion> onUpdate, Action onComplete, Func<float,float> ease)
+        {
+            yield return Start(duration, t => onUpdate(Quaternion.LerpUnclamped(start, end, t)), onComplete, ease);
+        }
+        
+        #endregion
     }
 }

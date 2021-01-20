@@ -1,8 +1,10 @@
-﻿using LpmGames.Utils.ControlFlow;
+﻿using System;
+using LpmGames.Utils.ControlFlow;
 
 // ReSharper disable once CheckNamespace
 namespace LpmGames.Utils
 {
+    [Serializable]
     public class Boxed<T>
     {
         public delegate void ChangeDelegate(Boxed<T> boxedValue, T previousValue);
@@ -24,6 +26,7 @@ namespace LpmGames.Utils
         
         private WaitForResult<T> _waitForChange;
         private T _value;
+        
         public T Value
         {
             get => _value;

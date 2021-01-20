@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using LpmGames.Utils.Debug;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -10,18 +9,29 @@ namespace LpmGames.Utils.ControlFlow
 {
     public static class CoroutineDirector
     {
-        private static readonly MonoBehaviour Executor;
-        
-        static CoroutineDirector()
+        private static MonoBehaviour Executor
         {
-            var executorContainer = new GameObject("CoroutineDirector");
-            Object.DontDestroyOnLoad(executorContainer);
-            Executor = executorContainer.AddComponent<CoroutineDirectorBehaviour>();
+            get
+            {
+                if (_executor != null) return _executor;
+                var executorContainer = new GameObject("CoroutineDirector");
+                Object.DontDestroyOnLoad(executorContainer);
+                _executor = executorContainer.AddComponent<CoroutineDirectorBehaviour>();
+                return _executor;
+            }
         }
+
+        private static MonoBehaviour _executor;
 
         private static CoroutinePlus StartCoroutine(Yielder yielder)
         {
             var routine = new CoroutinePlus(yielder);
+            StartCoroutine(routine);
+            return routine;
+        }
+        private static PipeableCoroutine<T> StartPipeableCoroutine<T>(WaitForResult<T> waiter)
+        {
+            var routine = new PipeableCoroutine<T>(waiter);
             StartCoroutine(routine);
             return routine;
         }
@@ -31,16 +41,18 @@ namespace LpmGames.Utils.ControlFlow
             var routine = new CoroutinePlus(yielder);
             return routine;
         }
-
+        
         public static CoroutinePlus StartCoroutine(YieldInstruction yield) => StartCoroutine(new Yielder(yield));
         public static CoroutinePlus StartCoroutine(IEnumerator enumerator) => StartCoroutine(new Yielder(enumerator));
         public static CoroutinePlus StartCoroutine(Func<IEnumerator> enumerator) => StartCoroutine(new Yielder(enumerator));
         public static CoroutinePlus StartCoroutine(Action action) => StartCoroutine(new Yielder(action));
-        
         public static CoroutinePlus CreateCoroutine(YieldInstruction yield) => CreateCoroutine(new Yielder(yield));
         public static CoroutinePlus CreateCoroutine(IEnumerator enumerator) => CreateCoroutine(new Yielder(enumerator));
         public static CoroutinePlus CreateCoroutine(Func<IEnumerator> enumerator) => CreateCoroutine(new Yielder(enumerator));
         public static CoroutinePlus CreateCoroutine(Action action) => CreateCoroutine(new Yielder(action));
+        
+        // The WaitForResult<T> construct gives us the ability to clean up syntax by piping results from Then()
+        public static PipeableCoroutine<T> StartCoroutine<T>(WaitForResult<T> waiter) => StartPipeableCoroutine(waiter);
 
         public static void StartCoroutine(CoroutinePlus coroutine)
         {
@@ -226,6 +238,19 @@ namespace LpmGames.Utils.ControlFlow
             }
         }
 
+        public class PipeableCoroutine<T> : CoroutinePlus
+        {
+            private readonly WaitForResult<T> _waiter;
+
+            public PipeableCoroutine(WaitForResult<T> waiter) : base(new Yielder(waiter))
+            {
+                _waiter = waiter;
+            }
+            
+            public CoroutinePlus Then(Action<T> next) => Then(new Yielder(() => next(_waiter.Result)));
+            public T Result => _waiter.Result;
+        }
+
         public class CoroutinePlus
         {
             public bool Running { get; private set; }
@@ -236,6 +261,7 @@ namespace LpmGames.Utils.ControlFlow
             private Queue<CoroutinePlus> _then;
 
             private WaitForContinue _awaitContinue;
+            private bool _hasRunAndFinished;
             
             public float Runtime
             {
@@ -248,6 +274,9 @@ namespace LpmGames.Utils.ControlFlow
 
             internal CoroutinePlus Then(Yielder next)
             {
+                if (_hasRunAndFinished)
+                    return StartCoroutine(next);
+                
                 if(_then == null) _then = new Queue<CoroutinePlus>();
                 var promised = new CoroutinePlus(next);
                 _then.Enqueue(promised);
@@ -259,15 +288,15 @@ namespace LpmGames.Utils.ControlFlow
             public CoroutinePlus Then(Func<IEnumerator> next) => Then(new Yielder(next));
             public CoroutinePlus Then(Action next) => Then(new Yielder(next));
             
-
             private Coroutine _coroutine;
-            private Yielder _original;
-
+            private readonly Yielder _original;
 
             public IEnumerator AwaitFinish(float timeout = 0)
             {
+                if (_hasRunAndFinished) yield break;
+                
                 if(_awaitContinue == null) _awaitContinue = new WaitForContinue(timeout);
-                return _awaitContinue;
+                yield return _awaitContinue;
             }
             
             public void SetCoroutine(Coroutine coroutine)
@@ -298,6 +327,7 @@ namespace LpmGames.Utils.ControlFlow
                 EndTime = Time.time;
                 Running = false;
                 _awaitContinue?.Continue();
+                _hasRunAndFinished = true;
                 while (_then != null && _then.Count > 0)
                 {
                     StartCoroutine(_then.Dequeue());

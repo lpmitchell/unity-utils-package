@@ -42,6 +42,12 @@ namespace LpmGames.Utils.Debug
             Write($"[{tag}] " + message, data);
         }
         
+        public static void Production(string message, object data = null, [CallerFilePath] string tag = "Unknown", [CallerLineNumber] int lineNumber = 0)
+        {
+            tag = PathToTag(tag, lineNumber);
+            Write($"[{tag}] " + message, data);
+        }
+        
         [Conditional("UNITY_WEBGL"), Conditional("UNITY_EDITOR")]
         public static void Warning(string message, object data = null, [CallerFilePath] string tag = "Unknown", [CallerLineNumber] int lineNumber = 0)
         {
@@ -93,7 +99,6 @@ namespace LpmGames.Utils.Debug
             return JsonUtility.ToJson(data, true);
         }
         
-        [Conditional("UNITY_WEBGL"), Conditional("UNITY_EDITOR")]
         private static void Write(string message, object data)
         {
             var messageExtra = SerializeDataObject(data);
@@ -175,12 +180,14 @@ namespace LpmGames.Utils.Debug
         
         private static void BrowserDispatch(LogMessage message)
         {
+#if !DISABLE_BRIDGE
             LocalBridge("ToolCallback", JsonUtility.ToJson(new EventCall
             {
                 Tool = "Console",
                 Event = "Message",
                 Data = JsonUtility.ToJson(message)
             }));
+#endif
         }
 #endif
     }

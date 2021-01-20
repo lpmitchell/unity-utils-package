@@ -6,6 +6,29 @@ namespace Extensions
 {
     public static class CameraExtensions
     {
+
+        public static Texture2D RenderToTexture(this Camera camera, int width = 0, int height = 0, int antiAliasing = 1)
+        {
+            if (width == 0) width = Screen.width;
+            if (height == 0) height = Screen.height;
+            var rt = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32)
+            {
+                antiAliasing = antiAliasing
+            };
+
+            var previousRt = camera.targetTexture;
+            camera.targetTexture = rt;
+            camera.Render();
+            
+            var thumb = new Texture2D(width, height, TextureFormat.RGB24, false);
+            RenderTexture.active = rt;
+            thumb.ReadPixels(new Rect(0, 0, width, height), 0, 0, false);
+            RenderTexture.active = null;
+            camera.targetTexture = previousRt;
+            rt.DiscardContents();
+            return thumb;
+        }
+
         public static float PointCollectionToOrthographicSize(this Camera camera, IEnumerable<Vector3> points, out Vector3 worldCenter, float pointRadius = 0f)
         {
             worldCenter = Vector3.zero;
