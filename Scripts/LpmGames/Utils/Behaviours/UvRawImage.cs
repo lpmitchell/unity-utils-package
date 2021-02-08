@@ -13,7 +13,7 @@ namespace LpmGames.Utils.Behaviours
             new Vector2(1, 0)
         };
         
-        private Vector2 RotateUv(Vector2 uv) =>  new Vector2(uv.y, -uv.x);
+        private static Vector2 RotateUv(Vector2 uv) =>  new Vector2(uv.y, -uv.x);
         
         public void UpdateUvs(bool rotated, float width, float height, float xPosition, float yPosition)
         {
@@ -24,8 +24,8 @@ namespace LpmGames.Utils.Behaviours
             // 4 - Transform to final
             
             var frameSize = new Vector2(
-                rotated ? height : width,
-                rotated ? width : height
+                width,
+                height
             );
             var framePosition = new Vector2(
                 xPosition + frameSize.x/2, 

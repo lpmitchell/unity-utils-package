@@ -67,7 +67,6 @@ namespace LpmGames.Utils.Easing
                 default:
                     throw new ArgumentOutOfRangeException(nameof(ease), ease, null);
             }
-            return f => f;
         }
     }
 }

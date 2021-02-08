@@ -7,11 +7,13 @@ namespace LpmGames.Utils.Extensions
     {
         public static Coroutine DestroyGameObjectInSeconds(this MonoBehaviour behaviour, float seconds)
         {
+            if (behaviour == null) return null;
             return behaviour.StartCoroutine(DestroyInSecondsCoroutine(behaviour.gameObject, seconds));
         }
         
         public static Coroutine DestroyBehaviourInSeconds(this MonoBehaviour behaviour, float seconds)
         {
+            if (behaviour == null) return null;
             return behaviour.StartCoroutine(DestroyInSecondsCoroutine(behaviour, seconds));
         }
 
