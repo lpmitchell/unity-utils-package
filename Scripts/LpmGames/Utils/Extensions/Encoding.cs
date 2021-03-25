@@ -143,6 +143,45 @@ namespace LpmGames.Utils.Extensions
 
             return sb.ToString ();
         }
+        
+        public static string CsvEncode (this string value)
+        {
+            if (string.IsNullOrEmpty (value)) return string.Empty;
+            
+            var len = value.Length;
+            var needEncode = false;
+            char c;
+            for (var i = 0; i < len; i++) {
+                c = value [i];
+                if (c != '"' && c != '\r' && c != '\n' && c != ',') continue;
+                
+                needEncode = true;
+                break;
+            }
+
+            if (!needEncode)
+                return value;
+
+            var sb = new StringBuilder ();
+            sb.Append ('"');
+
+            for (var i = 0; i < len; i++) {
+                c = value [i];
+                switch (c) {
+                    case '"':
+                        sb.Append("\"\"");
+                        break;
+                    
+                    default:
+                        sb.Append (c);
+                        break;
+                }
+            }
+
+            sb.Append ('"');
+
+            return sb.ToString ();
+        }
 
     }
 }

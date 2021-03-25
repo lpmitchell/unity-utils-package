@@ -247,7 +247,11 @@ namespace LpmGames.Utils.ControlFlow
                 _waiter = waiter;
             }
             
-            public CoroutinePlus Then(Action<T> next) => Then(new Yielder(() => next(_waiter.Result)));
+            public CoroutinePlus Then(Action<T> next) => Then(new Yielder(() =>
+            {
+                if (_waiter == null) return;
+                next(_waiter.Result);
+            }));
             public T Result => _waiter.Result;
         }
 
